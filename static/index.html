@@ -1,0 +1,912 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>健身打卡</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:       #0A0A0A;
+      --surface:  #141414;
+      --surface2: #1C1C1C;
+      --border:   rgba(255,255,255,.08);
+      --accent:   #C5F135;
+      --accent2:  #A8D420;
+      --blue:     #4FC3F7;
+      --red:      #FF5252;
+      --text:     #FFFFFF;
+      --muted:    rgba(255,255,255,.45);
+      --muted2:   rgba(255,255,255,.25);
+      --radius:   16px;
+    }
+
+    html, body {
+      height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "SF Pro Display", sans-serif;
+      overflow-x: hidden;
+    }
+
+    /* ── App shell ───────────────────────────────────────────── */
+    #app {
+      display: flex;
+      flex-direction: column;
+      height: 100dvh;
+      max-width: 480px;
+      margin: 0 auto;
+    }
+
+    .top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 20px 12px;
+      flex-shrink: 0;
+    }
+    .top-bar .brand {
+      font-size: .7rem;
+      font-weight: 700;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .top-bar .date-chip {
+      font-size: .7rem;
+      color: var(--muted);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 4px 12px;
+      letter-spacing: .04em;
+    }
+
+    /* ── Scrollable content area ─────────────────────────────── */
+    .content {
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
+      -webkit-overflow-scrolling: touch;
+      padding: 0 20px 24px;
+    }
+    .content::-webkit-scrollbar { display: none; }
+
+    /* ── Pages (tabs) ────────────────────────────────────────── */
+    .page { display: none; }
+    .page.active { display: block; }
+
+    /* ── Ring ───────────────────────────────────────────────── */
+    .hero-ring {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 12px 0 24px;
+      position: relative;
+    }
+    .ring-wrap {
+      position: relative;
+      width: 200px;
+      height: 200px;
+    }
+    .ring-svg {
+      transform: rotate(-90deg);
+      width: 200px;
+      height: 200px;
+    }
+    .ring-track {
+      fill: none;
+      stroke: var(--surface2);
+      stroke-width: 14;
+    }
+    .ring-fill {
+      fill: none;
+      stroke: var(--accent);
+      stroke-width: 14;
+      stroke-linecap: round;
+      stroke-dasharray: 502;
+      stroke-dashoffset: 502;
+      transition: stroke-dashoffset 1s cubic-bezier(.4,0,.2,1);
+      filter: drop-shadow(0 0 8px rgba(197,241,53,.6));
+    }
+    .ring-center {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .ring-number {
+      font-size: 4rem;
+      font-weight: 800;
+      line-height: 1;
+      color: var(--accent);
+      letter-spacing: -.02em;
+    }
+    .ring-unit {
+      font-size: .65rem;
+      color: var(--muted);
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      margin-top: 2px;
+    }
+
+    /* ── Check-in CTA ────────────────────────────────────────── */
+    .cta-btn {
+      width: 100%;
+      padding: 18px;
+      background: var(--accent);
+      color: #0A0A0A;
+      border: none;
+      border-radius: var(--radius);
+      font-size: 1rem;
+      font-weight: 800;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: transform .15s, opacity .15s, background .25s;
+      margin-bottom: 20px;
+    }
+    .cta-btn:hover  { opacity: .9; transform: scale(1.01); }
+    .cta-btn:active { transform: scale(.97); }
+    .cta-btn.done {
+      background: var(--surface2);
+      color: var(--accent);
+      border: 1.5px solid rgba(197,241,53,.35);
+    }
+
+    /* ── Mini stats row ──────────────────────────────────────── */
+    .mini-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 28px;
+    }
+    .mini-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px 12px;
+      text-align: center;
+    }
+    .mini-card .m-value {
+      font-size: 1.9rem;
+      font-weight: 800;
+      line-height: 1;
+      margin-bottom: 5px;
+    }
+    .mini-card .m-label {
+      font-size: .6rem;
+      color: var(--muted);
+      letter-spacing: .1em;
+      text-transform: uppercase;
+    }
+    .mini-card:nth-child(1) .m-value { color: var(--blue); }
+    .mini-card:nth-child(2) .m-value { color: var(--accent); }
+    .mini-card:nth-child(3) .m-value { color: #B39DDB; }
+
+    /* ── Section header ──────────────────────────────────────── */
+    .sec-hdr {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    .sec-hdr h2 {
+      font-size: .65rem;
+      font-weight: 700;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .sec-hdr .count-badge {
+      font-size: .65rem;
+      background: var(--surface2);
+      color: var(--muted);
+      border-radius: 20px;
+      padding: 2px 8px;
+    }
+
+    /* ── Record card ─────────────────────────────────────────── */
+    .record-list { display: flex; flex-direction: column; gap: 8px; }
+
+    .record-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      transition: border-color .18s;
+    }
+    .record-card:hover { border-color: rgba(255,255,255,.15); }
+
+    .rec-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: var(--surface2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+      flex-shrink: 0;
+    }
+    .rec-body { flex: 1; min-width: 0; }
+    .rec-name { font-size: .95rem; font-weight: 700; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .rec-chips { display: flex; gap: 6px; flex-wrap: wrap; }
+    .chip {
+      font-size: .65rem;
+      color: var(--muted);
+      background: var(--surface2);
+      border-radius: 6px;
+      padding: 2px 7px;
+    }
+    .rec-date { font-size: .65rem; color: var(--muted2); margin-top: 3px; }
+    .btn-del {
+      background: none;
+      border: none;
+      color: var(--muted2);
+      cursor: pointer;
+      font-size: 1rem;
+      padding: 6px;
+      border-radius: 8px;
+      transition: color .15s, background .15s;
+      flex-shrink: 0;
+    }
+    .btn-del:hover { color: var(--red); background: rgba(255,82,82,.1); }
+
+    /* empty */
+    .empty {
+      text-align: center;
+      padding: 48px 20px;
+      color: var(--muted);
+    }
+    .empty .e-icon { font-size: 2.8rem; margin-bottom: 10px; }
+    .empty p { font-size: .85rem; line-height: 1.5; }
+
+    /* ── Log form ────────────────────────────────────────────── */
+    .form-section { margin-bottom: 20px; }
+    .form-section .fs-title {
+      font-size: .65rem;
+      font-weight: 700;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+
+    .field-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; }
+    .field-group label { font-size: .7rem; color: var(--muted); letter-spacing: .06em; text-transform: uppercase; }
+    input, textarea, select {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 16px;
+      color: var(--text);
+      font-size: .95rem;
+      font-family: inherit;
+      transition: border-color .18s;
+      width: 100%;
+    }
+    input:focus, textarea:focus, select:focus {
+      outline: none;
+      border-color: rgba(197,241,53,.5);
+    }
+    input::placeholder, textarea::placeholder { color: var(--muted2); }
+    textarea { resize: vertical; min-height: 80px; }
+    input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(.4); cursor: pointer; }
+
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+    .submit-btn {
+      width: 100%;
+      padding: 18px;
+      margin-top: 6px;
+      background: var(--accent);
+      color: #0A0A0A;
+      border: none;
+      border-radius: var(--radius);
+      font-size: 1rem;
+      font-weight: 800;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: opacity .15s, transform .15s;
+    }
+    .submit-btn:hover  { opacity: .9; }
+    .submit-btn:active { transform: scale(.97); }
+    .submit-btn:disabled { opacity: .4; cursor: not-allowed; }
+
+    /* ── Stats page ──────────────────────────────────────────── */
+    .stats-hero {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 28px 24px;
+      margin-bottom: 16px;
+    }
+    .stats-hero .sh-label {
+      font-size: .65rem;
+      color: var(--muted);
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .stats-hero .sh-value {
+      font-size: 4.5rem;
+      font-weight: 800;
+      line-height: 1;
+      color: var(--accent);
+      letter-spacing: -.03em;
+    }
+    .stats-hero .sh-sub { font-size: .85rem; color: var(--muted); margin-top: 8px; }
+
+    .stat-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .stat-tile {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px 16px;
+    }
+    .stat-tile .t-label {
+      font-size: .6rem;
+      color: var(--muted);
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .stat-tile .t-value {
+      font-size: 2.2rem;
+      font-weight: 800;
+      line-height: 1;
+    }
+    .stat-tile:nth-child(1) .t-value { color: var(--blue); }
+    .stat-tile:nth-child(2) .t-value { color: #B39DDB; }
+
+    /* Weekly bar chart */
+    .week-chart {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 20px;
+      margin-bottom: 16px;
+    }
+    .week-chart .wc-title {
+      font-size: .65rem;
+      color: var(--muted);
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+    .week-bars {
+      display: flex;
+      align-items: flex-end;
+      gap: 8px;
+      height: 60px;
+    }
+    .week-bar-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; height: 100%; }
+    .week-bar-bg {
+      flex: 1;
+      width: 100%;
+      background: var(--surface2);
+      border-radius: 4px;
+      display: flex;
+      align-items: flex-end;
+      overflow: hidden;
+    }
+    .week-bar-fill {
+      width: 100%;
+      background: var(--accent);
+      border-radius: 4px;
+      transition: height .5s cubic-bezier(.4,0,.2,1);
+      min-height: 0;
+    }
+    .week-bar-fill.today-bar { background: var(--accent); filter: drop-shadow(0 0 4px rgba(197,241,53,.5)); }
+    .week-day-label { font-size: .55rem; color: var(--muted2); letter-spacing: .04em; }
+    .week-day-label.today-label { color: var(--accent); }
+
+    /* ── Filter bar ──────────────────────────────────────────── */
+    .filter-bar {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 14px;
+      align-items: center;
+    }
+    .filter-bar input { flex: 1; }
+    .clear-btn {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--muted);
+      font-size: .78rem;
+      padding: 10px 14px;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: color .15s;
+    }
+    .clear-btn:hover { color: var(--text); }
+
+    /* ── Bottom nav ──────────────────────────────────────────── */
+    .bottom-nav {
+      display: flex;
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      padding: 8px 0 max(8px, env(safe-area-inset-bottom));
+      flex-shrink: 0;
+    }
+    .nav-btn {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      padding: 6px 0;
+      background: none;
+      border: none;
+      cursor: pointer;
+      transition: opacity .15s;
+    }
+    .nav-btn .nav-icon { font-size: 1.3rem; }
+    .nav-btn .nav-label { font-size: .58rem; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); transition: color .15s; }
+    .nav-btn.active .nav-label { color: var(--accent); }
+    .nav-btn.active .nav-icon { filter: drop-shadow(0 0 4px rgba(197,241,53,.5)); }
+
+    /* ── Toast ───────────────────────────────────────────────── */
+    #toast {
+      position: fixed;
+      bottom: 90px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 50px;
+      padding: 12px 22px;
+      font-size: .85rem;
+      font-weight: 600;
+      white-space: nowrap;
+      z-index: 9999;
+      opacity: 0;
+      transition: transform .3s cubic-bezier(.34,1.56,.64,1), opacity .3s;
+    }
+    #toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+    #toast.ok  { border-color: rgba(197,241,53,.4); color: var(--accent); }
+    #toast.err { border-color: rgba(255,82,82,.4);  color: var(--red); }
+
+    /* ── Skeleton ────────────────────────────────────────────── */
+    @keyframes shimmer {
+      0%   { background-position: -400px 0; }
+      100% { background-position:  400px 0; }
+    }
+    .skel {
+      background: linear-gradient(90deg, var(--surface) 25%, var(--surface2) 50%, var(--surface) 75%);
+      background-size: 800px 100%;
+      animation: shimmer 1.4s infinite;
+      border-radius: 12px;
+    }
+
+    /* ── Scrollbar ───────────────────────────────────────────── */
+    ::-webkit-scrollbar { width: 0; }
+  </style>
+</head>
+<body>
+<div id="app">
+
+  <!-- ── Top bar ─────────────────────────────────────────── -->
+  <div class="top-bar">
+    <span class="brand">健身打卡</span>
+    <span class="date-chip" id="dateChip">—</span>
+  </div>
+
+  <!-- ── Scrollable content ──────────────────────────────── -->
+  <div class="content">
+
+    <!-- PAGE: 今日 ---------------------------------------- -->
+    <div class="page active" id="page-home">
+
+      <!-- Ring hero -->
+      <div class="hero-ring">
+        <div class="ring-wrap">
+          <svg class="ring-svg" viewBox="0 0 180 180">
+            <circle class="ring-track" cx="90" cy="90" r="80" />
+            <circle class="ring-fill" id="ringFill" cx="90" cy="90" r="80"
+                    stroke-dasharray="502" stroke-dashoffset="502" />
+          </svg>
+          <div class="ring-center">
+            <div class="ring-number" id="heroStreak">—</div>
+            <div class="ring-unit">连续打卡</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CTA -->
+      <button class="cta-btn" id="ctaBtn" onclick="quickCheckin()">今日打卡</button>
+
+      <!-- Mini stats -->
+      <div class="mini-stats">
+        <div class="mini-card">
+          <div class="m-value" id="mWeek">—</div>
+          <div class="m-label">本周</div>
+        </div>
+        <div class="mini-card">
+          <div class="m-value" id="mToday">—</div>
+          <div class="m-label">今日</div>
+        </div>
+        <div class="mini-card">
+          <div class="m-value" id="mTotal">—</div>
+          <div class="m-label">累计天</div>
+        </div>
+      </div>
+
+      <!-- Today's records -->
+      <div class="sec-hdr">
+        <h2>今日训练</h2>
+        <span class="count-badge" id="todayCount">0 条</span>
+      </div>
+      <div class="record-list" id="todayList">
+        <div class="skel" style="height:68px"></div>
+      </div>
+
+    </div><!-- /page-home -->
+
+    <!-- PAGE: 添加 ---------------------------------------- -->
+    <div class="page" id="page-add">
+      <div style="padding-top:8px"></div>
+
+      <div class="form-section">
+        <div class="fs-title">运动项目</div>
+        <div class="field-group">
+          <label>名称 *</label>
+          <input type="text" id="fName" placeholder="卧推、深蹲、跑步…" />
+        </div>
+        <div class="field-group">
+          <label>日期</label>
+          <input type="date" id="fDate" />
+        </div>
+      </div>
+
+      <div class="form-section">
+        <div class="fs-title">训练数据</div>
+        <div class="two-col">
+          <div class="field-group">
+            <label>时长 (分钟)</label>
+            <input type="number" id="fDuration" placeholder="30" min="1" />
+          </div>
+          <div class="field-group">
+            <label>重量 (kg)</label>
+            <input type="number" id="fWeight" placeholder="60" step="0.5" min="0" />
+          </div>
+          <div class="field-group">
+            <label>组数</label>
+            <input type="number" id="fSets" placeholder="3" min="1" />
+          </div>
+          <div class="field-group">
+            <label>次数/组</label>
+            <input type="number" id="fReps" placeholder="12" min="1" />
+          </div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <div class="fs-title">备注</div>
+        <div class="field-group">
+          <textarea id="fNotes" placeholder="今天的感受、PB、特别记录…"></textarea>
+        </div>
+      </div>
+
+      <button class="submit-btn" id="submitBtn" onclick="submitWorkout()">保存记录</button>
+      <div style="height:16px"></div>
+    </div><!-- /page-add -->
+
+    <!-- PAGE: 记录 ---------------------------------------- -->
+    <div class="page" id="page-records">
+      <div style="padding-top:8px"></div>
+      <div class="filter-bar">
+        <input type="date" id="filterDate" onchange="loadRecords()" />
+        <button class="clear-btn" onclick="clearFilter()">全部</button>
+      </div>
+      <div class="record-list" id="allList">
+        <div class="skel" style="height:68px"></div>
+        <div class="skel" style="height:68px;opacity:.6"></div>
+      </div>
+    </div><!-- /page-records -->
+
+    <!-- PAGE: 统计 ---------------------------------------- -->
+    <div class="page" id="page-stats">
+      <div style="padding-top:8px"></div>
+
+      <!-- Streak hero -->
+      <div class="stats-hero">
+        <div class="sh-label">当前连续打卡</div>
+        <div class="sh-value" id="sStreak">—</div>
+        <div class="sh-sub">天  · 保持节奏，不要断链</div>
+      </div>
+
+      <div class="stat-row">
+        <div class="stat-tile">
+          <div class="t-label">累计打卡天数</div>
+          <div class="t-value" id="sTotalDays">—</div>
+        </div>
+        <div class="stat-tile">
+          <div class="t-label">总训练记录</div>
+          <div class="t-value" id="sTotalRec">—</div>
+        </div>
+      </div>
+
+      <!-- Weekly chart -->
+      <div class="week-chart">
+        <div class="wc-title">本周打卡</div>
+        <div class="week-bars" id="weekBars">
+          <!-- filled by JS -->
+        </div>
+      </div>
+
+    </div><!-- /page-stats -->
+
+  </div><!-- /content -->
+
+  <!-- ── Bottom Nav ──────────────────────────────────────── -->
+  <nav class="bottom-nav">
+    <button class="nav-btn active" id="nav-home" onclick="switchTab('home')">
+      <span class="nav-icon">🏠</span>
+      <span class="nav-label">今日</span>
+    </button>
+    <button class="nav-btn" id="nav-add" onclick="switchTab('add')">
+      <span class="nav-icon">➕</span>
+      <span class="nav-label">添加</span>
+    </button>
+    <button class="nav-btn" id="nav-records" onclick="switchTab('records')">
+      <span class="nav-icon">📋</span>
+      <span class="nav-label">记录</span>
+    </button>
+    <button class="nav-btn" id="nav-stats" onclick="switchTab('stats')">
+      <span class="nav-icon">📊</span>
+      <span class="nav-label">统计</span>
+    </button>
+  </nav>
+
+</div><!-- /app -->
+<div id="toast"></div>
+
+<script>
+/* ── Utils ──────────────────────────────────────────────── */
+function todayISO() {
+  return new Date().toISOString().split('T')[0];
+}
+
+function fmtDate() {
+  return new Date().toLocaleDateString('zh-CN', { month:'long', day:'numeric', weekday:'short' });
+}
+
+let _toastT;
+function toast(msg, type = 'ok') {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = `show ${type}`;
+  clearTimeout(_toastT);
+  _toastT = setTimeout(() => el.className = '', 2600);
+}
+
+const EMOJI_MAP = {
+  '跑':'🏃','游':'🏊','骑':'🚴','卧推':'🏋️','深蹲':'🦵','引体':'💪',
+  '硬拉':'⛏️','哑铃':'🏋️','杠铃':'🏋️','瑜伽':'🧘','拳击':'🥊',
+  '篮球':'🏀','足球':'⚽','网球':'🎾','羽毛球':'🏸','乒乓':'🏓',
+  '跳绳':'🪢','HIIT':'🔥','打卡':'✅',
+};
+function getEmoji(name) {
+  for (const [k, v] of Object.entries(EMOJI_MAP)) if (name.includes(k)) return v;
+  return '💪';
+}
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+/* ── Tab switching ──────────────────────────────────────── */
+let currentTab = 'home';
+function switchTab(tab) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(`page-${tab}`).classList.add('active');
+  document.getElementById(`nav-${tab}`).classList.add('active');
+  currentTab = tab;
+  if (tab === 'records') loadRecords();
+  if (tab === 'stats') loadStats();
+}
+
+/* ── API ────────────────────────────────────────────────── */
+let statsCache = null;
+
+async function fetchStats() {
+  const res = await fetch('/api/stats');
+  statsCache = await res.json();
+  return statsCache;
+}
+
+async function loadHome() {
+  const s = await fetchStats();
+
+  // Ring: streak out of 7 (max one week goal)
+  const streakVal = s.current_streak;
+  document.getElementById('heroStreak').textContent = streakVal;
+  const pct = Math.min(streakVal / 7, 1);
+  const circumference = 502;
+  document.getElementById('ringFill').style.strokeDashoffset = circumference * (1 - pct);
+
+  // Mini stats
+  document.getElementById('mWeek').textContent  = s.this_week;
+  document.getElementById('mToday').textContent = s.checked_in_today ? '✓' : '—';
+  document.getElementById('mTotal').textContent = s.total_days;
+
+  // CTA state
+  const btn = document.getElementById('ctaBtn');
+  if (s.checked_in_today) {
+    btn.textContent = '已打卡 ✓';
+    btn.classList.add('done');
+  } else {
+    btn.textContent = '今日打卡';
+    btn.classList.remove('done');
+  }
+
+  // Today's records
+  await loadTodayRecords();
+}
+
+async function loadTodayRecords() {
+  const res = await fetch(`/api/records?date=${todayISO()}`);
+  const records = await res.json();
+  const list = document.getElementById('todayList');
+  const badge = document.getElementById('todayCount');
+  badge.textContent = `${records.length} 条`;
+
+  if (!records.length) {
+    list.innerHTML = `<div class="empty"><div class="e-icon">🌙</div><p>今天还没有训练记录<br>点击打卡开始吧！</p></div>`;
+    return;
+  }
+  list.innerHTML = records.map(r => renderCard(r)).join('');
+}
+
+async function loadRecords() {
+  const dateFilter = document.getElementById('filterDate').value;
+  const url = dateFilter ? `/api/records?date=${dateFilter}` : '/api/records';
+  const res = await fetch(url);
+  const records = await res.json();
+  const list = document.getElementById('allList');
+
+  if (!records.length) {
+    list.innerHTML = `<div class="empty"><div class="e-icon">📭</div><p>${dateFilter ? '该日期暂无记录' : '还没有训练记录'}</p></div>`;
+    return;
+  }
+  list.innerHTML = records.map(r => renderCard(r, true)).join('');
+}
+
+async function loadStats() {
+  const s = await fetchStats();
+  document.getElementById('sStreak').textContent   = s.current_streak;
+  document.getElementById('sTotalDays').textContent = s.total_days;
+  document.getElementById('sTotalRec').textContent  = s.total_records;
+  renderWeekChart(s.week_counts || []);
+}
+
+function renderWeekChart(weekCounts) {
+  const days = ['一','二','三','四','五','六','日'];
+  const todayDow = (new Date().getDay() + 6) % 7; // 0=Mon
+  const maxVal = Math.max(...weekCounts, 1);
+
+  document.getElementById('weekBars').innerHTML = days.map((d, i) => {
+    const val = weekCounts[i] || 0;
+    const pct = Math.round((val / maxVal) * 100);
+    const isToday = i === todayDow;
+    return `
+      <div class="week-bar-wrap">
+        <div class="week-bar-bg">
+          <div class="week-bar-fill${isToday ? ' today-bar' : ''}"
+               style="height:${pct}%"></div>
+        </div>
+        <div class="week-day-label${isToday ? ' today-label' : ''}">${d}</div>
+      </div>`;
+  }).join('');
+}
+
+function renderCard(r, showDate = false) {
+  const chips = [];
+  if (r.duration_min) chips.push(`⏱ ${r.duration_min}min`);
+  if (r.sets)         chips.push(`✕ ${r.sets}组`);
+  if (r.reps)         chips.push(`${r.reps}次`);
+  if (r.weight_kg)    chips.push(`${r.weight_kg}kg`);
+
+  return `
+  <div class="record-card" id="rc-${r.id}">
+    <div class="rec-icon">${getEmoji(r.exercise_name)}</div>
+    <div class="rec-body">
+      <div class="rec-name">${escHtml(r.exercise_name)}</div>
+      <div class="rec-chips">${chips.map(c=>`<span class="chip">${c}</span>`).join('')}</div>
+      ${showDate ? `<div class="rec-date">${r.date}</div>` : ''}
+      ${r.notes ? `<div class="rec-date" style="color:var(--muted)">💬 ${escHtml(r.notes)}</div>` : ''}
+    </div>
+    <button class="btn-del" onclick="delRecord(${r.id})">🗑</button>
+  </div>`;
+}
+
+/* ── Actions ────────────────────────────────────────────── */
+async function quickCheckin() {
+  const btn = document.getElementById('ctaBtn');
+  if (btn.classList.contains('done')) { toast('今天已经打过卡了 💪'); return; }
+  btn.disabled = true;
+  try {
+    await fetch('/api/checkin', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ exercise_name: '今日打卡', date: todayISO() }),
+    });
+    toast('🔥 打卡成功！继续保持！');
+    await loadHome();
+  } catch { toast('打卡失败，请重试', 'err'); }
+  finally { btn.disabled = false; }
+}
+
+async function submitWorkout() {
+  const name = document.getElementById('fName').value.trim();
+  if (!name) { toast('请填写运动项目名称', 'err'); return; }
+
+  const payload = {
+    exercise_name: name,
+    date:         document.getElementById('fDate').value || todayISO(),
+    duration_min: parseInt(document.getElementById('fDuration').value) || null,
+    weight_kg:    parseFloat(document.getElementById('fWeight').value) || null,
+    sets:         parseInt(document.getElementById('fSets').value) || null,
+    reps:         parseInt(document.getElementById('fReps').value) || null,
+    notes:        document.getElementById('fNotes').value.trim() || null,
+  };
+
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  btn.textContent = '保存中…';
+
+  try {
+    const res = await fetch('/api/checkin', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    if (!res.ok) throw new Error();
+    toast('✅ 记录已保存！');
+    ['fName','fDuration','fWeight','fSets','fReps','fNotes'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('fDate').value = todayISO();
+    switchTab('home');
+    await loadHome();
+  } catch { toast('保存失败，请重试', 'err'); }
+  finally { btn.disabled = false; btn.textContent = '保存记录'; }
+}
+
+async function delRecord(id) {
+  if (!confirm('删除这条记录？')) return;
+  try {
+    const res = await fetch(`/api/records/${id}`, { method: 'DELETE' });
+    if (!res.ok) throw new Error();
+    document.getElementById(`rc-${id}`)?.remove();
+    toast('已删除');
+    loadHome();
+  } catch { toast('删除失败', 'err'); }
+}
+
+function clearFilter() {
+  document.getElementById('filterDate').value = '';
+  loadRecords();
+}
+
+/* ── Init ───────────────────────────────────────────────── */
+document.getElementById('dateChip').textContent = fmtDate();
+document.getElementById('fDate').value = todayISO();
+loadHome();
+</script>
+</body>
+</html>
