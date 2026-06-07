@@ -8,18 +8,21 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg:       #0A0A0A;
-      --surface:  #141414;
-      --surface2: #1C1C1C;
-      --border:   rgba(255,255,255,.08);
-      --accent:   #C5F135;
-      --accent2:  #A8D420;
-      --blue:     #4FC3F7;
-      --red:      #FF5252;
-      --text:     #FFFFFF;
-      --muted:    rgba(255,255,255,.45);
-      --muted2:   rgba(255,255,255,.25);
-      --radius:   16px;
+      --bg:        #0A0A0A;
+      --surface:   #141414;
+      --surface2:  #1C1C1C;
+      --border:    rgba(255,255,255,.08);
+      --accent:    #C5F135;
+      --accent2:   #A8D420;
+      --blue:      #4FC3F7;
+      --red:       #FF5252;
+      --yellow:    #FFC107;
+      --green:     #4CAF50;
+      --purple:    #B39DDB;
+      --text:      #FFFFFF;
+      --muted:     rgba(255,255,255,.45);
+      --muted2:    rgba(255,255,255,.25);
+      --radius:    16px;
     }
 
     html, body {
@@ -30,7 +33,7 @@
       overflow-x: hidden;
     }
 
-    /* ── App shell ───────────────────────────────────────────── */
+    /* ── App shell ─────────────────────────────────────────── */
     #app {
       display: flex;
       flex-direction: column;
@@ -63,7 +66,7 @@
       letter-spacing: .04em;
     }
 
-    /* ── Scrollable content area ─────────────────────────────── */
+    /* ── Scrollable content area ───────────────────────────── */
     .content {
       flex: 1;
       overflow-y: auto;
@@ -73,16 +76,16 @@
     }
     .content::-webkit-scrollbar { display: none; }
 
-    /* ── Pages (tabs) ────────────────────────────────────────── */
+    /* ── Pages (tabs) ──────────────────────────────────────── */
     .page { display: none; }
     .page.active { display: block; }
 
-    /* ── Ring ───────────────────────────────────────────────── */
+    /* ── Recovery Ring ─────────────────────────────────────── */
     .hero-ring {
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 12px 0 24px;
+      padding: 12px 0 20px;
       position: relative;
     }
     .ring-wrap {
@@ -107,9 +110,12 @@
       stroke-linecap: round;
       stroke-dasharray: 502;
       stroke-dashoffset: 502;
-      transition: stroke-dashoffset 1s cubic-bezier(.4,0,.2,1);
+      transition: stroke-dashoffset 1.2s cubic-bezier(.4,0,.2,1), stroke .4s;
       filter: drop-shadow(0 0 8px rgba(197,241,53,.6));
     }
+    .ring-fill.green-ring { stroke: var(--green); filter: drop-shadow(0 0 10px rgba(76,175,80,.7)); }
+    .ring-fill.yellow-ring { stroke: var(--yellow); filter: drop-shadow(0 0 10px rgba(255,193,7,.7)); }
+    .ring-fill.red-ring { stroke: var(--red); filter: drop-shadow(0 0 10px rgba(255,82,82,.7)); }
     .ring-center {
       position: absolute;
       inset: 0;
@@ -119,21 +125,119 @@
       justify-content: center;
     }
     .ring-number {
-      font-size: 4rem;
+      font-size: 3.6rem;
       font-weight: 800;
       line-height: 1;
       color: var(--accent);
       letter-spacing: -.02em;
     }
+    .ring-number.green-text { color: var(--green); }
+    .ring-number.yellow-text { color: var(--yellow); }
+    .ring-number.red-text { color: var(--red); }
     .ring-unit {
-      font-size: .65rem;
+      font-size: .6rem;
       color: var(--muted);
       letter-spacing: .12em;
       text-transform: uppercase;
       margin-top: 2px;
     }
+    .ring-label {
+      font-size: .75rem;
+      color: var(--muted);
+      margin-top: 12px;
+      letter-spacing: .06em;
+    }
 
-    /* ── Check-in CTA ────────────────────────────────────────── */
+    /* ── Health metric chips ───────────────────────────────── */
+    .metric-chips {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+    .metric-chip {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 10px 6px;
+      text-align: center;
+    }
+    .mc-value {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--blue);
+      margin-bottom: 3px;
+    }
+    .mc-label {
+      font-size: .5rem;
+      color: var(--muted);
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+
+    /* ── Insights list ─────────────────────────────────────── */
+    .insights-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+    .insights-title {
+      font-size: .6rem;
+      font-weight: 700;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 12px;
+    }
+    .insight-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      margin-bottom: 8px;
+      font-size: .82rem;
+      line-height: 1.45;
+      color: rgba(255,255,255,.8);
+    }
+    .insight-item:last-child { margin-bottom: 0; }
+    .insight-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+      flex-shrink: 0;
+      margin-top: 5px;
+    }
+
+    /* ── Streak secondary block ────────────────────────────── */
+    .streak-secondary {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+    .streak-num {
+      font-size: 2.8rem;
+      font-weight: 800;
+      color: var(--accent);
+      line-height: 1;
+    }
+    .streak-info { flex: 1; }
+    .streak-label {
+      font-size: .65rem;
+      color: var(--muted);
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      margin-bottom: 2px;
+    }
+    .streak-sub { font-size: .8rem; color: var(--muted); }
+
+    /* ── CTA button ────────────────────────────────────────── */
     .cta-btn {
       width: 100%;
       padding: 18px;
@@ -146,7 +250,7 @@
       letter-spacing: .08em;
       text-transform: uppercase;
       cursor: pointer;
-      transition: transform .15s, opacity .15s, background .25s;
+      transition: transform .15s, opacity .15s;
       margin-bottom: 20px;
     }
     .cta-btn:hover  { opacity: .9; transform: scale(1.01); }
@@ -157,7 +261,7 @@
       border: 1.5px solid rgba(197,241,53,.35);
     }
 
-    /* ── Mini stats row ──────────────────────────────────────── */
+    /* ── Mini stats row ────────────────────────────────────── */
     .mini-stats {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -185,9 +289,9 @@
     }
     .mini-card:nth-child(1) .m-value { color: var(--blue); }
     .mini-card:nth-child(2) .m-value { color: var(--accent); }
-    .mini-card:nth-child(3) .m-value { color: #B39DDB; }
+    .mini-card:nth-child(3) .m-value { color: var(--purple); }
 
-    /* ── Section header ──────────────────────────────────────── */
+    /* ── Section header ────────────────────────────────────── */
     .sec-hdr {
       display: flex;
       align-items: center;
@@ -209,9 +313,8 @@
       padding: 2px 8px;
     }
 
-    /* ── Record card ─────────────────────────────────────────── */
+    /* ── Record card ───────────────────────────────────────── */
     .record-list { display: flex; flex-direction: column; gap: 8px; }
-
     .record-card {
       background: var(--surface);
       border: 1px solid var(--border);
@@ -223,7 +326,6 @@
       transition: border-color .18s;
     }
     .record-card:hover { border-color: rgba(255,255,255,.15); }
-
     .rec-icon {
       width: 44px;
       height: 44px;
@@ -268,7 +370,7 @@
     .empty .e-icon { font-size: 2.8rem; margin-bottom: 10px; }
     .empty p { font-size: .85rem; line-height: 1.5; }
 
-    /* ── Log form ────────────────────────────────────────────── */
+    /* ── Form elements ─────────────────────────────────────── */
     .form-section { margin-bottom: 20px; }
     .form-section .fs-title {
       font-size: .65rem;
@@ -278,7 +380,6 @@
       color: var(--muted);
       margin-bottom: 10px;
     }
-
     .field-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; }
     .field-group label { font-size: .7rem; color: var(--muted); letter-spacing: .06em; text-transform: uppercase; }
     input, textarea, select {
@@ -299,8 +400,29 @@
     input::placeholder, textarea::placeholder { color: var(--muted2); }
     textarea { resize: vertical; min-height: 80px; }
     input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(.4); cursor: pointer; }
+    input[type="time"]::-webkit-calendar-picker-indicator { filter: invert(.4); cursor: pointer; }
+    input[type="range"] {
+      padding: 6px 0;
+      accent-color: var(--accent);
+      border: none;
+      background: transparent;
+    }
+    .range-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .range-row input[type="range"] { flex: 1; }
+    .range-val {
+      font-size: .85rem;
+      font-weight: 700;
+      color: var(--accent);
+      min-width: 38px;
+      text-align: right;
+    }
 
     .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
 
     .submit-btn {
       width: 100%;
@@ -321,7 +443,203 @@
     .submit-btn:active { transform: scale(.97); }
     .submit-btn:disabled { opacity: .4; cursor: not-allowed; }
 
-    /* ── Stats page ──────────────────────────────────────────── */
+    /* ── Sleep history list ────────────────────────────────── */
+    .sleep-history-item {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 8px;
+      cursor: pointer;
+      transition: border-color .18s;
+    }
+    .sleep-history-item:hover { border-color: rgba(255,255,255,.15); }
+    .sleep-score-badge {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      font-weight: 800;
+      flex-shrink: 0;
+    }
+    .score-green { background: rgba(76,175,80,.2); color: var(--green); border: 1px solid rgba(76,175,80,.3); }
+    .score-yellow { background: rgba(255,193,7,.2); color: var(--yellow); border: 1px solid rgba(255,193,7,.3); }
+    .score-red { background: rgba(255,82,82,.2); color: var(--red); border: 1px solid rgba(255,82,82,.3); }
+    .score-none { background: var(--surface2); color: var(--muted); border: 1px solid var(--border); }
+    .sleep-info { flex: 1; min-width: 0; }
+    .sleep-date { font-size: .85rem; font-weight: 700; margin-bottom: 3px; }
+    .sleep-sub { font-size: .7rem; color: var(--muted); }
+
+    /* Sleep stage bar */
+    .stage-bar-wrap {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+    .stage-bar-title {
+      font-size: .6rem;
+      font-weight: 700;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 12px;
+    }
+    .stage-bar {
+      display: flex;
+      height: 24px;
+      border-radius: 6px;
+      overflow: hidden;
+      margin-bottom: 10px;
+    }
+    .stage-seg { transition: width .6s cubic-bezier(.4,0,.2,1); }
+    .seg-deep  { background: #3F51B5; }
+    .seg-rem   { background: #9C27B0; }
+    .seg-light { background: #4FC3F7; }
+    .seg-awake { background: #FF7043; }
+    .stage-legend {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: .65rem;
+      color: var(--muted);
+    }
+    .legend-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 2px;
+      flex-shrink: 0;
+    }
+
+    /* Component score breakdown */
+    .component-scores {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+    .comp-title {
+      font-size: .6rem;
+      font-weight: 700;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 12px;
+    }
+    .comp-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .comp-row:last-child { margin-bottom: 0; }
+    .comp-name {
+      font-size: .75rem;
+      color: var(--muted);
+      width: 70px;
+      flex-shrink: 0;
+    }
+    .comp-bar-bg {
+      flex: 1;
+      height: 6px;
+      background: var(--surface2);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    .comp-bar-fill {
+      height: 100%;
+      border-radius: 3px;
+      background: var(--accent);
+      transition: width .8s cubic-bezier(.4,0,.2,1);
+    }
+    .comp-score {
+      font-size: .75rem;
+      font-weight: 700;
+      color: var(--accent);
+      width: 32px;
+      text-align: right;
+      flex-shrink: 0;
+    }
+
+    /* ── Collapsible section ───────────────────────────────── */
+    .collapsible-hdr {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px 16px;
+      cursor: pointer;
+      margin-bottom: 8px;
+      transition: border-color .18s;
+    }
+    .collapsible-hdr:hover { border-color: rgba(255,255,255,.15); }
+    .collapsible-hdr-text { font-size: .85rem; font-weight: 600; }
+    .collapsible-arrow {
+      font-size: .7rem;
+      color: var(--muted);
+      transition: transform .25s;
+    }
+    .collapsible-hdr.open .collapsible-arrow { transform: rotate(180deg); }
+    .collapsible-body {
+      display: none;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+    .collapsible-body.open { display: block; }
+
+    /* Apple Watch guide */
+    .aw-guide-step {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+    .aw-step-num {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--accent);
+      color: #0A0A0A;
+      font-size: .7rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+    .aw-step-text { font-size: .82rem; line-height: 1.5; color: rgba(255,255,255,.8); }
+    .aw-code-block {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-family: "SF Mono", "Fira Code", monospace;
+      font-size: .72rem;
+      color: var(--accent);
+      margin-top: 8px;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+
+    /* ── Stats page ────────────────────────────────────────── */
     .stats-hero {
       background: var(--surface);
       border: 1px solid var(--border);
@@ -344,7 +662,6 @@
       letter-spacing: -.03em;
     }
     .stats-hero .sh-sub { font-size: .85rem; color: var(--muted); margin-top: 8px; }
-
     .stat-row {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -370,9 +687,7 @@
       line-height: 1;
     }
     .stat-tile:nth-child(1) .t-value { color: var(--blue); }
-    .stat-tile:nth-child(2) .t-value { color: #B39DDB; }
-
-    /* Weekly bar chart */
+    .stat-tile:nth-child(2) .t-value { color: var(--purple); }
     .week-chart {
       background: var(--surface);
       border: 1px solid var(--border);
@@ -410,11 +725,11 @@
       transition: height .5s cubic-bezier(.4,0,.2,1);
       min-height: 0;
     }
-    .week-bar-fill.today-bar { background: var(--accent); filter: drop-shadow(0 0 4px rgba(197,241,53,.5)); }
+    .week-bar-fill.today-bar { filter: drop-shadow(0 0 4px rgba(197,241,53,.5)); }
     .week-day-label { font-size: .55rem; color: var(--muted2); letter-spacing: .04em; }
     .week-day-label.today-label { color: var(--accent); }
 
-    /* ── Filter bar ──────────────────────────────────────────── */
+    /* ── Filter bar ────────────────────────────────────────── */
     .filter-bar {
       display: flex;
       gap: 8px;
@@ -435,7 +750,164 @@
     }
     .clear-btn:hover { color: var(--text); }
 
-    /* ── Bottom nav ──────────────────────────────────────────── */
+    /* ── AI Chat ───────────────────────────────────────────── */
+    .ai-header {
+      padding: 16px 0 12px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 12px;
+    }
+    .ai-header h1 { font-size: 1.1rem; font-weight: 800; margin-bottom: 3px; }
+    .ai-header p { font-size: .75rem; color: var(--muted); }
+
+    .ai-context-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 14px;
+      margin-bottom: 12px;
+    }
+    .toggle-label { font-size: .78rem; color: var(--muted); }
+    .toggle-switch {
+      position: relative;
+      width: 42px;
+      height: 24px;
+      cursor: pointer;
+    }
+    .toggle-switch input { opacity: 0; width: 0; height: 0; }
+    .toggle-track {
+      position: absolute;
+      inset: 0;
+      background: var(--surface2);
+      border-radius: 12px;
+      transition: background .2s;
+      border: 1px solid var(--border);
+    }
+    .toggle-switch input:checked + .toggle-track { background: var(--accent2); border-color: var(--accent); }
+    .toggle-knob {
+      position: absolute;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: var(--muted2);
+      top: 3px;
+      left: 3px;
+      transition: transform .2s, background .2s;
+    }
+    .toggle-switch input:checked ~ .toggle-knob { transform: translateX(18px); background: var(--accent); }
+
+    .quick-chips {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+    }
+    .quick-chip {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 7px 12px;
+      font-size: .75rem;
+      color: var(--muted);
+      cursor: pointer;
+      transition: border-color .15s, color .15s;
+      white-space: nowrap;
+    }
+    .quick-chip:hover { border-color: rgba(197,241,53,.4); color: var(--accent); }
+
+    .chat-messages {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 14px;
+      min-height: 120px;
+    }
+    .chat-msg {
+      max-width: 88%;
+      padding: 12px 14px;
+      border-radius: 14px;
+      font-size: .88rem;
+      line-height: 1.5;
+    }
+    .chat-msg.user {
+      align-self: flex-end;
+      background: rgba(197,241,53,.18);
+      border: 1px solid rgba(197,241,53,.25);
+      color: var(--text);
+      border-bottom-right-radius: 4px;
+    }
+    .chat-msg.assistant {
+      align-self: flex-start;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-bottom-left-radius: 4px;
+    }
+    .chat-msg.typing::after {
+      content: '';
+      display: inline-block;
+      width: 6px;
+      height: 14px;
+      background: var(--accent);
+      margin-left: 2px;
+      animation: blink .8s infinite;
+      vertical-align: text-bottom;
+    }
+    @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0; } }
+
+    .chat-input-area {
+      display: flex;
+      gap: 8px;
+      align-items: flex-end;
+    }
+    .chat-input-area textarea {
+      flex: 1;
+      min-height: 46px;
+      max-height: 120px;
+      padding: 12px 14px;
+      resize: none;
+      border-radius: 14px;
+    }
+    .send-btn {
+      width: 46px;
+      height: 46px;
+      border-radius: 14px;
+      background: var(--accent);
+      color: #0A0A0A;
+      border: none;
+      cursor: pointer;
+      font-size: 1.2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: opacity .15s, transform .15s;
+    }
+    .send-btn:hover { opacity: .9; }
+    .send-btn:active { transform: scale(.93); }
+    .send-btn:disabled { opacity: .4; cursor: not-allowed; }
+
+    .ai-error-card {
+      background: rgba(255,82,82,.1);
+      border: 1px solid rgba(255,82,82,.3);
+      border-radius: var(--radius);
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+    .ai-error-card h3 { color: var(--red); font-size: .9rem; margin-bottom: 8px; }
+    .ai-error-card p { font-size: .8rem; color: rgba(255,255,255,.7); line-height: 1.5; }
+    .ai-error-card code {
+      background: var(--bg);
+      border-radius: 4px;
+      padding: 2px 6px;
+      font-family: "SF Mono", monospace;
+      font-size: .75rem;
+      color: var(--accent);
+    }
+
+    /* ── Bottom nav ────────────────────────────────────────── */
     .bottom-nav {
       display: flex;
       background: var(--surface);
@@ -455,12 +927,12 @@
       cursor: pointer;
       transition: opacity .15s;
     }
-    .nav-btn .nav-icon { font-size: 1.3rem; }
-    .nav-btn .nav-label { font-size: .58rem; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); transition: color .15s; }
+    .nav-btn .nav-icon { font-size: 1.2rem; }
+    .nav-btn .nav-label { font-size: .5rem; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); transition: color .15s; }
     .nav-btn.active .nav-label { color: var(--accent); }
     .nav-btn.active .nav-icon { filter: drop-shadow(0 0 4px rgba(197,241,53,.5)); }
 
-    /* ── Toast ───────────────────────────────────────────────── */
+    /* ── Toast ─────────────────────────────────────────────── */
     #toast {
       position: fixed;
       bottom: 90px;
@@ -481,7 +953,7 @@
     #toast.ok  { border-color: rgba(197,241,53,.4); color: var(--accent); }
     #toast.err { border-color: rgba(255,82,82,.4);  color: var(--red); }
 
-    /* ── Skeleton ────────────────────────────────────────────── */
+    /* ── Skeleton ──────────────────────────────────────────── */
     @keyframes shimmer {
       0%   { background-position: -400px 0; }
       100% { background-position:  400px 0; }
@@ -493,60 +965,80 @@
       border-radius: 12px;
     }
 
-    /* ── Scrollbar ───────────────────────────────────────────── */
     ::-webkit-scrollbar { width: 0; }
   </style>
 </head>
 <body>
 <div id="app">
 
-  <!-- ── Top bar ─────────────────────────────────────────── -->
+  <!-- ── Top bar ──────────────────────────────────────────── -->
   <div class="top-bar">
     <span class="brand">健身打卡</span>
     <span class="date-chip" id="dateChip">—</span>
   </div>
 
-  <!-- ── Scrollable content ──────────────────────────────── -->
+  <!-- ── Scrollable content ───────────────────────────────── -->
   <div class="content">
 
-    <!-- PAGE: 今日 ---------------------------------------- -->
+    <!-- PAGE: 今日 ----------------------------------------- -->
     <div class="page active" id="page-home">
 
-      <!-- Ring hero -->
+      <!-- Recovery Ring Hero -->
       <div class="hero-ring">
         <div class="ring-wrap">
           <svg class="ring-svg" viewBox="0 0 180 180">
             <circle class="ring-track" cx="90" cy="90" r="80" />
-            <circle class="ring-fill" id="ringFill" cx="90" cy="90" r="80"
+            <circle class="ring-fill" id="recoveryRingFill" cx="90" cy="90" r="80"
                     stroke-dasharray="502" stroke-dashoffset="502" />
           </svg>
           <div class="ring-center">
-            <div class="ring-number" id="heroStreak">—</div>
-            <div class="ring-unit">连续打卡</div>
+            <div class="ring-number" id="recoveryScore">—</div>
+            <div class="ring-unit" id="recoveryLabel">恢复指数</div>
           </div>
         </div>
+        <div class="ring-label" id="recoveryCategory">加载中…</div>
       </div>
 
-      <!-- CTA -->
-      <button class="cta-btn" id="ctaBtn" onclick="quickCheckin()">今日打卡</button>
-
-      <!-- Mini stats -->
-      <div class="mini-stats">
-        <div class="mini-card">
-          <div class="m-value" id="mWeek">—</div>
-          <div class="m-label">本周</div>
+      <!-- Health metric chips -->
+      <div class="metric-chips">
+        <div class="metric-chip">
+          <div class="mc-value" id="chipHrv">—</div>
+          <div class="mc-label">HRV ms</div>
         </div>
-        <div class="mini-card">
-          <div class="m-value" id="mToday">—</div>
-          <div class="m-label">今日</div>
+        <div class="metric-chip">
+          <div class="mc-value" id="chipRhr">—</div>
+          <div class="mc-label">静息心率</div>
         </div>
-        <div class="mini-card">
-          <div class="m-value" id="mTotal">—</div>
-          <div class="m-label">累计天</div>
+        <div class="metric-chip">
+          <div class="mc-value" id="chipSpo2">—</div>
+          <div class="mc-label">SpO2 %</div>
+        </div>
+        <div class="metric-chip">
+          <div class="mc-value" id="chipResp">—</div>
+          <div class="mc-label">呼吸/分</div>
         </div>
       </div>
 
-      <!-- Today's records -->
+      <!-- Today insights -->
+      <div class="insights-card" id="insightsCard">
+        <div class="insights-title">今日洞察</div>
+        <div id="insightsList">
+          <div class="skel" style="height:16px;margin-bottom:8px"></div>
+          <div class="skel" style="height:16px;margin-bottom:8px;opacity:.7"></div>
+          <div class="skel" style="height:16px;opacity:.4"></div>
+        </div>
+      </div>
+
+      <!-- Workout streak (secondary) -->
+      <div class="streak-secondary">
+        <div class="streak-num" id="homeStreak">—</div>
+        <div class="streak-info">
+          <div class="streak-label">连续打卡</div>
+          <div class="streak-sub" id="homeStreakSub">本周 — 次训练</div>
+        </div>
+      </div>
+
+      <!-- Today's training records -->
       <div class="sec-hdr">
         <h2>今日训练</h2>
         <span class="count-badge" id="todayCount">0 条</span>
@@ -555,9 +1047,193 @@
         <div class="skel" style="height:68px"></div>
       </div>
 
+      <!-- Quick check-in -->
+      <div style="height:20px"></div>
+      <button class="cta-btn" id="ctaBtn" onclick="quickCheckin()">今日打卡</button>
+
     </div><!-- /page-home -->
 
-    <!-- PAGE: 添加 ---------------------------------------- -->
+    <!-- PAGE: 睡眠 ----------------------------------------- -->
+    <div class="page" id="page-sleep">
+      <div style="padding-top:8px"></div>
+
+      <!-- Sleep input form -->
+      <div class="form-section">
+        <div class="fs-title">睡眠记录</div>
+
+        <div class="field-group">
+          <label>日期</label>
+          <input type="date" id="slDate" />
+        </div>
+
+        <div class="two-col">
+          <div class="field-group">
+            <label>入睡时间</label>
+            <input type="time" id="slBedTime" placeholder="23:00" />
+          </div>
+          <div class="field-group">
+            <label>起床时间</label>
+            <input type="time" id="slWakeTime" placeholder="07:00" />
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label>实际睡眠时长 (分钟)</label>
+          <div class="range-row">
+            <input type="range" id="slSleepDur" min="0" max="720" step="5" value="420"
+                   oninput="document.getElementById('slSleepDurVal').textContent=this.value+'min'" />
+            <span class="range-val" id="slSleepDurVal">420min</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <div class="fs-title">睡眠阶段 (分钟)</div>
+        <div class="two-col">
+          <div class="field-group">
+            <label>深睡</label>
+            <input type="number" id="slDeep" placeholder="90" min="0" max="300" />
+          </div>
+          <div class="field-group">
+            <label>REM</label>
+            <input type="number" id="slRem" placeholder="100" min="0" max="300" />
+          </div>
+          <div class="field-group">
+            <label>浅睡</label>
+            <input type="number" id="slLight" placeholder="200" min="0" max="500" />
+          </div>
+          <div class="field-group">
+            <label>清醒</label>
+            <input type="number" id="slAwake" placeholder="30" min="0" max="200" />
+          </div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <div class="fs-title">健康指标</div>
+        <div class="two-col">
+          <div class="field-group">
+            <label>HRV (ms)</label>
+            <input type="number" id="slHrv" placeholder="55" min="1" max="300" step="0.1" />
+          </div>
+          <div class="field-group">
+            <label>静息心率 (bpm)</label>
+            <input type="number" id="slRhr" placeholder="58" min="30" max="120" />
+          </div>
+          <div class="field-group">
+            <label>血氧 SpO2 (%)</label>
+            <input type="number" id="slSpo2" placeholder="98" min="80" max="100" step="0.1" />
+          </div>
+          <div class="field-group">
+            <label>呼吸频率 (/分)</label>
+            <input type="number" id="slResp" placeholder="15" min="8" max="30" step="0.1" />
+          </div>
+        </div>
+      </div>
+
+      <button class="submit-btn" id="sleepSubmitBtn" onclick="submitSleep()">保存睡眠记录</button>
+
+      <!-- Apple Watch sync section -->
+      <div style="height:16px"></div>
+      <div class="collapsible-hdr" id="awHdr" onclick="toggleCollapsible('awHdr','awBody')">
+        <span class="collapsible-hdr-text">📱 Apple Watch 自动同步</span>
+        <span class="collapsible-arrow">▼</span>
+      </div>
+      <div class="collapsible-body" id="awBody">
+        <p style="font-size:.8rem;color:var(--muted);margin-bottom:14px;line-height:1.5">
+          通过 iOS 捷径，可将 Apple 健康数据每日自动推送到此 App，无需手动输入。
+        </p>
+        <div class="aw-guide-step">
+          <div class="aw-step-num">1</div>
+          <div class="aw-step-text">打开 iPhone 上的<strong>「捷径」</strong>App，点击右上角 <strong>+</strong> 新建捷径。</div>
+        </div>
+        <div class="aw-guide-step">
+          <div class="aw-step-num">2</div>
+          <div class="aw-step-text">
+            搜索并依次添加以下动作：<br>
+            <strong>获取健康样本</strong>（睡眠分析、HRV、静息心率、血氧饱和度）
+          </div>
+        </div>
+        <div class="aw-guide-step">
+          <div class="aw-step-num">3</div>
+          <div class="aw-step-text">
+            添加<strong>「获取 URL 的内容」</strong>动作，配置如下：
+            <div class="aw-code-block">URL: POST http://YOUR_SERVER_IP:8000/api/health/apple-watch
+
+请求体 (JSON):
+{
+  "date": "{{当前日期}}",
+  "sleep_duration_min": {{睡眠分析时长}},
+  "hrv_avg": {{HRV平均值}},
+  "resting_hr": {{静息心率}},
+  "spo2": {{血氧}},
+  "bed_time": "{{入睡时间 HH:MM}}",
+  "wake_time": "{{起床时间 HH:MM}}"
+}</div>
+          </div>
+        </div>
+        <div class="aw-guide-step">
+          <div class="aw-step-num">4</div>
+          <div class="aw-step-text">
+            将捷径设置为<strong>「自动化」</strong>，选择<strong>「每日早晨」</strong>触发（建议早上7-9点），完成后台自动运行。
+          </div>
+        </div>
+        <p style="font-size:.72rem;color:var(--muted);margin-top:6px">
+          * 将 YOUR_SERVER_IP 替换为实际服务器地址。数据以 upsert 方式写入，重复运行安全。
+        </p>
+      </div>
+
+      <!-- Sleep history -->
+      <div class="sec-hdr" style="margin-top:8px">
+        <h2>近期睡眠</h2>
+        <span class="count-badge">7天</span>
+      </div>
+      <div id="sleepHistoryList">
+        <div class="skel" style="height:60px;margin-bottom:8px"></div>
+        <div class="skel" style="height:60px;margin-bottom:8px;opacity:.7"></div>
+      </div>
+
+      <!-- Sleep detail (shown when user taps a history item) -->
+      <div id="sleepDetail" style="display:none">
+        <div class="stage-bar-wrap">
+          <div class="stage-bar-title">睡眠阶段分布</div>
+          <div class="stage-bar" id="stageBar"></div>
+          <div class="stage-legend">
+            <div class="legend-item"><div class="legend-dot seg-deep"></div>深睡</div>
+            <div class="legend-item"><div class="legend-dot seg-rem"></div>REM</div>
+            <div class="legend-item"><div class="legend-dot seg-light"></div>浅睡</div>
+            <div class="legend-item"><div class="legend-dot seg-awake"></div>清醒</div>
+          </div>
+        </div>
+        <div class="component-scores">
+          <div class="comp-title">恢复评分细分</div>
+          <div class="comp-row">
+            <div class="comp-name">HRV</div>
+            <div class="comp-bar-bg"><div class="comp-bar-fill" id="compHrv" style="width:0%"></div></div>
+            <div class="comp-score" id="compHrvVal">—</div>
+          </div>
+          <div class="comp-row">
+            <div class="comp-name">静息心率</div>
+            <div class="comp-bar-bg"><div class="comp-bar-fill" id="compRhr" style="width:0%"></div></div>
+            <div class="comp-score" id="compRhrVal">—</div>
+          </div>
+          <div class="comp-row">
+            <div class="comp-name">睡眠时长</div>
+            <div class="comp-bar-bg"><div class="comp-bar-fill" id="compSleep" style="width:0%"></div></div>
+            <div class="comp-score" id="compSleepVal">—</div>
+          </div>
+          <div class="comp-row">
+            <div class="comp-name">睡眠阶段</div>
+            <div class="comp-bar-bg"><div class="comp-bar-fill" id="compStages" style="width:0%"></div></div>
+            <div class="comp-score" id="compStagesVal">—</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="height:16px"></div>
+    </div><!-- /page-sleep -->
+
+    <!-- PAGE: 训练 ----------------------------------------- -->
     <div class="page" id="page-add">
       <div style="padding-top:8px"></div>
 
@@ -602,11 +1278,11 @@
         </div>
       </div>
 
-      <button class="submit-btn" id="submitBtn" onclick="submitWorkout()">保存记录</button>
+      <button class="submit-btn" id="submitBtn" onclick="submitWorkout()">保存训练记录</button>
       <div style="height:16px"></div>
     </div><!-- /page-add -->
 
-    <!-- PAGE: 记录 ---------------------------------------- -->
+    <!-- PAGE: 记录 ----------------------------------------- -->
     <div class="page" id="page-records">
       <div style="padding-top:8px"></div>
       <div class="filter-bar">
@@ -619,57 +1295,76 @@
       </div>
     </div><!-- /page-records -->
 
-    <!-- PAGE: 统计 ---------------------------------------- -->
-    <div class="page" id="page-stats">
-      <div style="padding-top:8px"></div>
-
-      <!-- Streak hero -->
-      <div class="stats-hero">
-        <div class="sh-label">当前连续打卡</div>
-        <div class="sh-value" id="sStreak">—</div>
-        <div class="sh-sub">天  · 保持节奏，不要断链</div>
+    <!-- PAGE: AI助手 --------------------------------------- -->
+    <div class="page" id="page-ai">
+      <div class="ai-header">
+        <h1>AI健康助手</h1>
+        <p>基于您的健康数据提供个性化建议</p>
       </div>
 
-      <div class="stat-row">
-        <div class="stat-tile">
-          <div class="t-label">累计打卡天数</div>
-          <div class="t-value" id="sTotalDays">—</div>
-        </div>
-        <div class="stat-tile">
-          <div class="t-label">总训练记录</div>
-          <div class="t-value" id="sTotalRec">—</div>
+      <div id="aiErrorCard" style="display:none" class="ai-error-card">
+        <h3>API Key 未配置</h3>
+        <p>
+          请在服务器端设置环境变量：<br>
+          <code>export ANTHROPIC_API_KEY=sk-ant-...</code><br><br>
+          设置后重启服务即可使用 AI 助手功能。
+        </p>
+      </div>
+
+      <div class="ai-context-toggle">
+        <span class="toggle-label">附带健康数据</span>
+        <label class="toggle-switch">
+          <input type="checkbox" id="includeHealthCtx" checked />
+          <div class="toggle-track"></div>
+          <div class="toggle-knob"></div>
+        </label>
+      </div>
+
+      <div class="quick-chips">
+        <div class="quick-chip" onclick="sendQuickMsg('今天适合训练吗？')">今天适合训练吗？</div>
+        <div class="quick-chip" onclick="sendQuickMsg('如何提高我的睡眠质量？')">如何提高睡眠质量？</div>
+        <div class="quick-chip" onclick="sendQuickMsg('我的HRV偏低是什么原因？')">HRV偏低原因？</div>
+        <div class="quick-chip" onclick="sendQuickMsg('帮我制定本周训练计划')">本周训练计划</div>
+      </div>
+
+      <div class="chat-messages" id="chatMessages">
+        <div class="chat-msg assistant">
+          你好！我是你的AI健康助手。我可以根据你的睡眠、HRV和训练数据提供个性化建议。有什么想了解的吗？
         </div>
       </div>
 
-      <!-- Weekly chart -->
-      <div class="week-chart">
-        <div class="wc-title">本周打卡</div>
-        <div class="week-bars" id="weekBars">
-          <!-- filled by JS -->
-        </div>
+      <div class="chat-input-area">
+        <textarea id="chatInput" placeholder="输入问题…" rows="1"
+                  onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChat()}"
+                  oninput="autoResize(this)"></textarea>
+        <button class="send-btn" id="sendBtn" onclick="sendChat()">↑</button>
       </div>
-
-    </div><!-- /page-stats -->
+      <div style="height:16px"></div>
+    </div><!-- /page-ai -->
 
   </div><!-- /content -->
 
-  <!-- ── Bottom Nav ──────────────────────────────────────── -->
+  <!-- ── Bottom Nav ───────────────────────────────────────── -->
   <nav class="bottom-nav">
     <button class="nav-btn active" id="nav-home" onclick="switchTab('home')">
       <span class="nav-icon">🏠</span>
       <span class="nav-label">今日</span>
     </button>
+    <button class="nav-btn" id="nav-sleep" onclick="switchTab('sleep')">
+      <span class="nav-icon">🌙</span>
+      <span class="nav-label">睡眠</span>
+    </button>
     <button class="nav-btn" id="nav-add" onclick="switchTab('add')">
-      <span class="nav-icon">➕</span>
-      <span class="nav-label">添加</span>
+      <span class="nav-icon">💪</span>
+      <span class="nav-label">训练</span>
     </button>
     <button class="nav-btn" id="nav-records" onclick="switchTab('records')">
       <span class="nav-icon">📋</span>
       <span class="nav-label">记录</span>
     </button>
-    <button class="nav-btn" id="nav-stats" onclick="switchTab('stats')">
-      <span class="nav-icon">📊</span>
-      <span class="nav-label">统计</span>
+    <button class="nav-btn" id="nav-ai" onclick="switchTab('ai')">
+      <span class="nav-icon">🤖</span>
+      <span class="nav-label">AI助手</span>
     </button>
   </nav>
 
@@ -695,6 +1390,17 @@ function toast(msg, type = 'ok') {
   _toastT = setTimeout(() => el.className = '', 2600);
 }
 
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function fmtMin(min) {
+  if (!min) return '—';
+  const h = Math.floor(min / 60);
+  const m = min % 60;
+  return h > 0 ? `${h}h${m > 0 ? m + 'm' : ''}` : `${m}m`;
+}
+
 const EMOJI_MAP = {
   '跑':'🏃','游':'🏊','骑':'🚴','卧推':'🏋️','深蹲':'🦵','引体':'💪',
   '硬拉':'⛏️','哑铃':'🏋️','杠铃':'🏋️','瑜伽':'🧘','拳击':'🥊',
@@ -706,10 +1412,6 @@ function getEmoji(name) {
   return '💪';
 }
 
-function escHtml(s) {
-  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-}
-
 /* ── Tab switching ──────────────────────────────────────── */
 let currentTab = 'home';
 function switchTab(tab) {
@@ -719,36 +1421,87 @@ function switchTab(tab) {
   document.getElementById(`nav-${tab}`).classList.add('active');
   currentTab = tab;
   if (tab === 'records') loadRecords();
-  if (tab === 'stats') loadStats();
+  if (tab === 'sleep') loadSleepTab();
+  if (tab === 'ai') scrollChatBottom();
 }
 
-/* ── API ────────────────────────────────────────────────── */
-let statsCache = null;
-
-async function fetchStats() {
-  const res = await fetch('/api/stats');
-  statsCache = await res.json();
-  return statsCache;
+/* ── Collapsible ───────────────────────────────────────── */
+function toggleCollapsible(hdrId, bodyId) {
+  const hdr = document.getElementById(hdrId);
+  const body = document.getElementById(bodyId);
+  hdr.classList.toggle('open');
+  body.classList.toggle('open');
 }
 
-async function loadHome() {
-  const s = await fetchStats();
+/* ── Recovery ring rendering ────────────────────────────── */
+function applyRecoveryRing(score, category) {
+  const fill = document.getElementById('recoveryRingFill');
+  const numEl = document.getElementById('recoveryScore');
+  const catEl = document.getElementById('recoveryCategory');
 
-  // Ring: streak out of 7 (max one week goal)
-  const streakVal = s.current_streak;
-  document.getElementById('heroStreak').textContent = streakVal;
-  const pct = Math.min(streakVal / 7, 1);
   const circumference = 502;
-  document.getElementById('ringFill').style.strokeDashoffset = circumference * (1 - pct);
+  const pct = Math.min(score / 100, 1);
+  fill.style.strokeDashoffset = circumference * (1 - pct);
 
-  // Mini stats
-  document.getElementById('mWeek').textContent  = s.this_week;
-  document.getElementById('mToday').textContent = s.checked_in_today ? '✓' : '—';
-  document.getElementById('mTotal').textContent = s.total_days;
+  fill.classList.remove('green-ring','yellow-ring','red-ring');
+  numEl.classList.remove('green-text','yellow-text','red-text');
 
-  // CTA state
+  if (category === 'green') {
+    fill.classList.add('green-ring');
+    numEl.classList.add('green-text');
+    catEl.textContent = '恢复优秀 · 适合高强度训练';
+  } else if (category === 'yellow') {
+    fill.classList.add('yellow-ring');
+    numEl.classList.add('yellow-text');
+    catEl.textContent = '恢复适中 · 建议中等强度训练';
+  } else {
+    fill.classList.add('red-ring');
+    numEl.classList.add('red-text');
+    catEl.textContent = '恢复偏低 · 建议轻度恢复';
+  }
+  numEl.textContent = score;
+}
+
+/* ── Home page data ─────────────────────────────────────── */
+async function loadHome() {
+  const [recoveryRes, statsRes] = await Promise.all([
+    fetch('/api/recovery/today'),
+    fetch('/api/stats'),
+  ]);
+  const recovery = await recoveryRes.json();
+  const stats = await statsRes.json();
+
+  // Recovery ring
+  if (recovery.has_data) {
+    applyRecoveryRing(recovery.recovery.score, recovery.recovery.category);
+    document.getElementById('chipHrv').textContent = recovery.hrv_avg ? Math.round(recovery.hrv_avg) : '—';
+    document.getElementById('chipRhr').textContent = recovery.resting_hr || '—';
+    document.getElementById('chipSpo2').textContent = recovery.spo2 ? recovery.spo2.toFixed(1) : '—';
+    document.getElementById('chipResp').textContent = recovery.respiratory_rate ? recovery.respiratory_rate.toFixed(1) : '—';
+  } else {
+    document.getElementById('recoveryScore').textContent = '—';
+    document.getElementById('recoveryCategory').textContent = '暂无睡眠数据';
+    ['chipHrv','chipRhr','chipSpo2','chipResp'].forEach(id => document.getElementById(id).textContent = '—');
+  }
+
+  // Insights
+  const insights = recovery.insights || [];
+  const insightsList = document.getElementById('insightsList');
+  if (insights.length) {
+    insightsList.innerHTML = insights.map(i =>
+      `<div class="insight-item"><div class="insight-dot"></div><span>${escHtml(i)}</span></div>`
+    ).join('');
+  } else {
+    insightsList.innerHTML = '<div class="insight-item"><div class="insight-dot"></div><span>记录睡眠数据以获取个性化洞察</span></div>';
+  }
+
+  // Streak & weekly
+  document.getElementById('homeStreak').textContent = stats.current_streak;
+  document.getElementById('homeStreakSub').textContent = `本周 ${stats.this_week} 次训练`;
+
+  // CTA
   const btn = document.getElementById('ctaBtn');
-  if (s.checked_in_today) {
+  if (stats.checked_in_today) {
     btn.textContent = '已打卡 ✓';
     btn.classList.add('done');
   } else {
@@ -756,7 +1509,6 @@ async function loadHome() {
     btn.classList.remove('done');
   }
 
-  // Today's records
   await loadTodayRecords();
 }
 
@@ -766,54 +1518,25 @@ async function loadTodayRecords() {
   const list = document.getElementById('todayList');
   const badge = document.getElementById('todayCount');
   badge.textContent = `${records.length} 条`;
-
   if (!records.length) {
-    list.innerHTML = `<div class="empty"><div class="e-icon">🌙</div><p>今天还没有训练记录<br>点击打卡开始吧！</p></div>`;
+    list.innerHTML = `<div class="empty"><div class="e-icon">🌙</div><p>今天还没有训练记录<br>去「训练」标签添加吧！</p></div>`;
     return;
   }
   list.innerHTML = records.map(r => renderCard(r)).join('');
 }
 
+/* ── Records page ───────────────────────────────────────── */
 async function loadRecords() {
   const dateFilter = document.getElementById('filterDate').value;
   const url = dateFilter ? `/api/records?date=${dateFilter}` : '/api/records';
   const res = await fetch(url);
   const records = await res.json();
   const list = document.getElementById('allList');
-
   if (!records.length) {
     list.innerHTML = `<div class="empty"><div class="e-icon">📭</div><p>${dateFilter ? '该日期暂无记录' : '还没有训练记录'}</p></div>`;
     return;
   }
   list.innerHTML = records.map(r => renderCard(r, true)).join('');
-}
-
-async function loadStats() {
-  const s = await fetchStats();
-  document.getElementById('sStreak').textContent   = s.current_streak;
-  document.getElementById('sTotalDays').textContent = s.total_days;
-  document.getElementById('sTotalRec').textContent  = s.total_records;
-  renderWeekChart(s.week_counts || []);
-}
-
-function renderWeekChart(weekCounts) {
-  const days = ['一','二','三','四','五','六','日'];
-  const todayDow = (new Date().getDay() + 6) % 7; // 0=Mon
-  const maxVal = Math.max(...weekCounts, 1);
-
-  document.getElementById('weekBars').innerHTML = days.map((d, i) => {
-    const val = weekCounts[i] || 0;
-    const pct = Math.round((val / maxVal) * 100);
-    const isToday = i === todayDow;
-    return `
-      <div class="week-bar-wrap">
-        <div class="week-bar-bg">
-          <div class="week-bar-fill${isToday ? ' today-bar' : ''}"
-               style="height:${pct}%"></div>
-        </div>
-        <div class="week-day-label${isToday ? ' today-label' : ''}">${d}</div>
-      </div>`;
-  }).join('');
 }
 
 function renderCard(r, showDate = false) {
@@ -822,7 +1545,6 @@ function renderCard(r, showDate = false) {
   if (r.sets)         chips.push(`✕ ${r.sets}组`);
   if (r.reps)         chips.push(`${r.reps}次`);
   if (r.weight_kg)    chips.push(`${r.weight_kg}kg`);
-
   return `
   <div class="record-card" id="rc-${r.id}">
     <div class="rec-icon">${getEmoji(r.exercise_name)}</div>
@@ -836,7 +1558,147 @@ function renderCard(r, showDate = false) {
   </div>`;
 }
 
-/* ── Actions ────────────────────────────────────────────── */
+function clearFilter() {
+  document.getElementById('filterDate').value = '';
+  loadRecords();
+}
+
+/* ── Sleep tab ──────────────────────────────────────────── */
+async function loadSleepTab() {
+  const res = await fetch('/api/health/sleep?limit=7');
+  const records = await res.json();
+  const list = document.getElementById('sleepHistoryList');
+
+  if (!records.length) {
+    list.innerHTML = `<div class="empty"><div class="e-icon">😴</div><p>还没有睡眠记录<br>在上方填写今日睡眠数据吧！</p></div>`;
+    return;
+  }
+
+  list.innerHTML = records.map(r => {
+    const score = r.recovery ? r.recovery.score : null;
+    const cat = r.recovery ? r.recovery.category : 'none';
+    const badgeClass = score !== null ? `score-${cat}` : 'score-none';
+    const badgeText = score !== null ? score : '—';
+    const sleepH = r.sleep_duration_min ? fmtMin(r.sleep_duration_min) : '—';
+    const hrv = r.hrv_avg ? Math.round(r.hrv_avg) + 'ms' : '—';
+    const dateStr = r.date;
+    return `
+    <div class="sleep-history-item" onclick="showSleepDetail(${JSON.stringify(r).replace(/"/g, '&quot;')})">
+      <div class="sleep-score-badge ${badgeClass}">${badgeText}</div>
+      <div class="sleep-info">
+        <div class="sleep-date">${dateStr}</div>
+        <div class="sleep-sub">睡眠 ${sleepH} &nbsp;·&nbsp; HRV ${hrv}</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Auto-show detail for first record
+  if (records.length > 0) {
+    showSleepDetail(records[0]);
+  }
+}
+
+function showSleepDetail(record) {
+  const detail = document.getElementById('sleepDetail');
+  detail.style.display = 'block';
+
+  // Stage bar
+  const total = (record.deep_sleep_min || 0) + (record.rem_sleep_min || 0)
+              + (record.light_sleep_min || 0) + (record.awake_min || 0);
+  const stageBar = document.getElementById('stageBar');
+  if (total > 0) {
+    const deepPct  = ((record.deep_sleep_min  || 0) / total * 100).toFixed(1);
+    const remPct   = ((record.rem_sleep_min   || 0) / total * 100).toFixed(1);
+    const lightPct = ((record.light_sleep_min || 0) / total * 100).toFixed(1);
+    const awakePct = ((record.awake_min       || 0) / total * 100).toFixed(1);
+    stageBar.innerHTML = `
+      <div class="stage-seg seg-deep"  style="width:${deepPct}%"  title="深睡 ${record.deep_sleep_min}min"></div>
+      <div class="stage-seg seg-rem"   style="width:${remPct}%"   title="REM ${record.rem_sleep_min}min"></div>
+      <div class="stage-seg seg-light" style="width:${lightPct}%" title="浅睡 ${record.light_sleep_min}min"></div>
+      <div class="stage-seg seg-awake" style="width:${awakePct}%" title="清醒 ${record.awake_min}min"></div>`;
+  } else {
+    stageBar.innerHTML = `<div class="stage-seg seg-light" style="width:100%"></div>`;
+  }
+
+  // Component scores
+  if (record.recovery && record.recovery.components) {
+    const c = record.recovery.components;
+    setCompBar('compHrv',    'compHrvVal',    c.hrv,               35);
+    setCompBar('compRhr',    'compRhrVal',    c.resting_hr,        25);
+    setCompBar('compSleep',  'compSleepVal',  c.sleep_performance, 25);
+    setCompBar('compStages', 'compStagesVal', c.sleep_stages,      15);
+  }
+}
+
+function setCompBar(barId, valId, value, maxVal) {
+  const pct = maxVal > 0 ? Math.min(value / maxVal * 100, 100) : 0;
+  document.getElementById(barId).style.width = pct + '%';
+  document.getElementById(valId).textContent = value !== undefined ? value.toFixed(1) : '—';
+}
+
+async function submitSleep() {
+  const btn = document.getElementById('sleepSubmitBtn');
+  const date = document.getElementById('slDate').value || todayISO();
+  const sleepDur = parseInt(document.getElementById('slSleepDur').value) || null;
+  const bedTime = document.getElementById('slBedTime').value || null;
+  const wakeTime = document.getElementById('slWakeTime').value || null;
+  const deep = parseInt(document.getElementById('slDeep').value) || null;
+  const rem = parseInt(document.getElementById('slRem').value) || null;
+  const light = parseInt(document.getElementById('slLight').value) || null;
+  const awake = parseInt(document.getElementById('slAwake').value) || null;
+  const hrv = parseFloat(document.getElementById('slHrv').value) || null;
+  const rhr = parseInt(document.getElementById('slRhr').value) || null;
+  const spo2 = parseFloat(document.getElementById('slSpo2').value) || null;
+  const resp = parseFloat(document.getElementById('slResp').value) || null;
+
+  const totalMin = bedTime && wakeTime ? computeTotalMin(bedTime, wakeTime) : null;
+
+  const payload = {
+    date,
+    bed_time: bedTime,
+    wake_time: wakeTime,
+    total_duration_min: totalMin,
+    sleep_duration_min: sleepDur,
+    deep_sleep_min: deep,
+    rem_sleep_min: rem,
+    light_sleep_min: light,
+    awake_min: awake,
+    hrv_avg: hrv,
+    resting_hr: rhr,
+    spo2,
+    respiratory_rate: resp,
+    source: 'manual',
+  };
+
+  btn.disabled = true;
+  btn.textContent = '保存中…';
+  try {
+    const res = await fetch('/api/health/sleep', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    if (!res.ok) throw new Error(await res.text());
+    toast('✅ 睡眠记录已保存！');
+    await loadSleepTab();
+    if (currentTab === 'home') await loadHome();
+  } catch (e) {
+    toast('保存失败，请重试', 'err');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '保存睡眠记录';
+  }
+}
+
+function computeTotalMin(bedTime, wakeTime) {
+  const [bh, bm] = bedTime.split(':').map(Number);
+  const [wh, wm] = wakeTime.split(':').map(Number);
+  let total = (wh * 60 + wm) - (bh * 60 + bm);
+  if (total < 0) total += 24 * 60; // crosses midnight
+  return total;
+}
+
+/* ── Workout actions ────────────────────────────────────── */
 async function quickCheckin() {
   const btn = document.getElementById('ctaBtn');
   if (btn.classList.contains('done')) { toast('今天已经打过卡了 💪'); return; }
@@ -856,7 +1718,6 @@ async function quickCheckin() {
 async function submitWorkout() {
   const name = document.getElementById('fName').value.trim();
   if (!name) { toast('请填写运动项目名称', 'err'); return; }
-
   const payload = {
     exercise_name: name,
     date:         document.getElementById('fDate').value || todayISO(),
@@ -866,11 +1727,9 @@ async function submitWorkout() {
     reps:         parseInt(document.getElementById('fReps').value) || null,
     notes:        document.getElementById('fNotes').value.trim() || null,
   };
-
   const btn = document.getElementById('submitBtn');
   btn.disabled = true;
   btn.textContent = '保存中…';
-
   try {
     const res = await fetch('/api/checkin', {
       method: 'POST',
@@ -878,13 +1737,13 @@ async function submitWorkout() {
       body: JSON.stringify(payload),
     });
     if (!res.ok) throw new Error();
-    toast('✅ 记录已保存！');
+    toast('✅ 训练记录已保存！');
     ['fName','fDuration','fWeight','fSets','fReps','fNotes'].forEach(id => document.getElementById(id).value = '');
     document.getElementById('fDate').value = todayISO();
     switchTab('home');
     await loadHome();
   } catch { toast('保存失败，请重试', 'err'); }
-  finally { btn.disabled = false; btn.textContent = '保存记录'; }
+  finally { btn.disabled = false; btn.textContent = '保存训练记录'; }
 }
 
 async function delRecord(id) {
@@ -898,14 +1757,142 @@ async function delRecord(id) {
   } catch { toast('删除失败', 'err'); }
 }
 
-function clearFilter() {
-  document.getElementById('filterDate').value = '';
-  loadRecords();
+/* ── AI Chat ────────────────────────────────────────────── */
+let chatHistory = [];
+let isStreaming = false;
+
+function scrollChatBottom() {
+  const msgs = document.getElementById('chatMessages');
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function autoResize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+}
+
+function appendUserMsg(text) {
+  const msgs = document.getElementById('chatMessages');
+  const div = document.createElement('div');
+  div.className = 'chat-msg user';
+  div.textContent = text;
+  msgs.appendChild(div);
+  scrollChatBottom();
+}
+
+function appendAssistantMsg() {
+  const msgs = document.getElementById('chatMessages');
+  const div = document.createElement('div');
+  div.className = 'chat-msg assistant typing';
+  div.textContent = '';
+  msgs.appendChild(div);
+  scrollChatBottom();
+  return div;
+}
+
+async function sendChat() {
+  if (isStreaming) return;
+  const input = document.getElementById('chatInput');
+  const text = input.value.trim();
+  if (!text) return;
+
+  input.value = '';
+  input.style.height = 'auto';
+  appendUserMsg(text);
+  chatHistory.push({ role: 'user', content: text });
+
+  await streamAI();
+}
+
+async function sendQuickMsg(text) {
+  if (isStreaming) return;
+  switchTab('ai');
+  appendUserMsg(text);
+  chatHistory.push({ role: 'user', content: text });
+  await streamAI();
+}
+
+async function streamAI() {
+  isStreaming = true;
+  const sendBtn = document.getElementById('sendBtn');
+  sendBtn.disabled = true;
+
+  const includeCtx = document.getElementById('includeHealthCtx').checked;
+  const aiEl = appendAssistantMsg();
+
+  try {
+    const res = await fetch('/api/ai/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        messages: chatHistory,
+        include_health_context: includeCtx,
+      }),
+    });
+
+    if (res.status === 503) {
+      const err = await res.json();
+      // Check if it's API key error
+      if (err.detail && err.detail.includes('ANTHROPIC_API_KEY')) {
+        document.getElementById('aiErrorCard').style.display = 'block';
+      }
+      aiEl.classList.remove('typing');
+      aiEl.textContent = '⚠️ ' + (err.detail || 'AI 服务暂时不可用');
+      chatHistory.push({ role: 'assistant', content: aiEl.textContent });
+      return;
+    }
+
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder();
+    let fullText = '';
+    let buffer = '';
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      buffer += decoder.decode(value, { stream: true });
+      const lines = buffer.split('\n');
+      buffer = lines.pop();
+
+      for (const line of lines) {
+        if (!line.startsWith('data: ')) continue;
+        const payload = line.slice(6).trim();
+        if (payload === '[DONE]') break;
+        try {
+          const parsed = JSON.parse(payload);
+          if (parsed.error) {
+            aiEl.textContent = '⚠️ ' + parsed.error;
+            aiEl.classList.remove('typing');
+            return;
+          }
+          if (parsed.text) {
+            fullText += parsed.text;
+            aiEl.textContent = fullText;
+            scrollChatBottom();
+          }
+        } catch {}
+      }
+    }
+
+    aiEl.classList.remove('typing');
+    if (fullText) {
+      chatHistory.push({ role: 'assistant', content: fullText });
+    }
+  } catch (e) {
+    aiEl.classList.remove('typing');
+    aiEl.textContent = '⚠️ 网络错误，请稍后重试';
+  } finally {
+    isStreaming = false;
+    sendBtn.disabled = false;
+    scrollChatBottom();
+  }
 }
 
 /* ── Init ───────────────────────────────────────────────── */
 document.getElementById('dateChip').textContent = fmtDate();
 document.getElementById('fDate').value = todayISO();
+document.getElementById('slDate').value = todayISO();
 loadHome();
 </script>
 </body>
