@@ -201,11 +201,20 @@ def _upsert_sleep(db: Session, payload_dict: dict, source: str) -> health_models
         return record
 
 
-# ── Root route ────────────────────────────────────────────────────────────────
+# ── Root route & PWA support ──────────────────────────────────────────────────
 
 @app.get("/")
 def root():
     return FileResponse("static/index.html")
+
+@app.get("/manifest.json")
+def manifest():
+    return FileResponse("static/manifest.json", media_type="application/manifest+json")
+
+@app.get("/sw.js")
+def service_worker():
+    return FileResponse("static/sw.js", media_type="application/javascript",
+                        headers={"Service-Worker-Allowed": "/"})
 
 
 # ── Workout endpoints ─────────────────────────────────────────────────────────

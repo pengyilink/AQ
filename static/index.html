@@ -4,6 +4,12 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>健身打卡</title>
+  <link rel="manifest" href="/manifest.json" />
+  <meta name="theme-color" content="#0A0A0A" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="健身打卡" />
+  <link rel="apple-touch-icon" href="/static/icon-180.png" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -1894,6 +1900,59 @@ document.getElementById('dateChip').textContent = fmtDate();
 document.getElementById('fDate').value = todayISO();
 document.getElementById('slDate').value = todayISO();
 loadHome();
+
+// ── PWA Install ──────────────────────────────────────────────────────────────
+let _deferredInstall = null;
+
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  _deferredInstall = e;
+  const bar = document.getElementById('installBar');
+  if (bar) bar.style.display = 'flex';
+});
+
+window.addEventListener('appinstalled', () => {
+  const bar = document.getElementById('installBar');
+  if (bar) bar.style.display = 'none';
+  _deferredInstall = null;
+});
+
+document.getElementById('installBtn')?.addEventListener('click', async () => {
+  if (!_deferredInstall) return;
+  _deferredInstall.prompt();
+  const { outcome } = await _deferredInstall.userChoice;
+  if (outcome === 'accepted') _deferredInstall = null;
+});
+
+document.getElementById('installDismiss')?.addEventListener('click', () => {
+  document.getElementById('installBar').style.display = 'none';
+});
+
+// ── Service Worker ───────────────────────────────────────────────────────────
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js', { scope: '/' })
+    .catch(err => console.warn('SW registration failed:', err));
+}
 </script>
+
+<!-- PWA Install Banner -->
+<div id="installBar" style="
+  display:none; position:fixed; bottom:72px; left:50%; transform:translateX(-50%);
+  width:calc(100% - 32px); max-width:448px;
+  background:#1C1C1C; border:1px solid rgba(197,241,53,.25); border-radius:16px;
+  padding:14px 16px; align-items:center; gap:12px; z-index:999;
+  box-shadow:0 8px 32px rgba(0,0,0,.6);">
+  <img src="/static/icon-192.png" style="width:40px;height:40px;border-radius:10px;flex-shrink:0;" alt="icon" />
+  <div style="flex:1;">
+    <div style="font-size:.85rem;font-weight:700;color:#fff;margin-bottom:2px;">添加到主屏幕</div>
+    <div style="font-size:.72rem;color:rgba(255,255,255,.5);">像原生 App 一样使用</div>
+  </div>
+  <button id="installBtn" style="
+    background:#C5F135;color:#0A0A0A;border:none;border-radius:10px;
+    padding:8px 16px;font-size:.8rem;font-weight:800;cursor:pointer;flex-shrink:0;">安装</button>
+  <button id="installDismiss" style="
+    background:none;border:none;color:rgba(255,255,255,.4);font-size:1.2rem;
+    cursor:pointer;padding:4px;line-height:1;">×</button>
+</div>
 </body>
 </html>
